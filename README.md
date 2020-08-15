@@ -24,7 +24,7 @@ To check your balance: ***(Only you will be able to see the parameters you send 
 
 ```./secretcli tx compute execute <contract-address> '{"balance": {}}' --from <account>```
 
-```./secretcli q compute tx <returned tx-hash>```
+```./secretcli q compute tx <returned tx-hash> --trust-node=true```
 
 To withdraw: ***(This is public)***
 
@@ -32,11 +32,11 @@ To withdraw: ***(This is public)***
 
 To set your viewing key: 
 
-```./secretcli tx compute execute <contract-address> '{"create_viewing_key": {"entropy": "<random_phrase>"}}'```
+```./secretcli tx compute execute <contract-address> '{"create_viewing_key": {"entropy": "<random_phrase>"}}' --from <account>```
 
 Make your random phrase as long as you want. At least 15 characters are recommended. You do not have to remember it - it will simply be used to randomize your generated viewing key. After this is done you can get your viewing key:
 
-```./secretcli q compute tx <returned tx-hash>```
+```./secretcli q compute tx <returned tx-hash>  --trust-node=true```
 
 The key will start with the prefix `api_key_....`
 
@@ -54,4 +54,4 @@ The deployed SSCRT contract address on the testnet is `secret1umwqjum7f4zmp9alr2
 
 All transactions are encrypted, so if you want to see the error returned by a failed transaction, you need to use the command
 
-`secretcli q compute tx <TX_HASH>`
+`secretcli q compute tx <TX_HASH> --trust-node=true`
