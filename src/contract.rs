@@ -12,6 +12,7 @@ use crate::state::{store_transfer, get_transfers};
 #[derive(Serialize, Debug, Deserialize, Clone, PartialEq, JsonSchema)]
 pub struct Constants {
     pub name: String,
+    pub admin: HumanAddr,
     pub symbol: String,
     pub decimals: u8,
 }
@@ -56,11 +57,14 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
         return Err(generic_err("Decimals must not exceed 18"));
     }
 
+    let admin = msg.admin.clone();
+
     let mut config_store = PrefixedStorage::new(PREFIX_CONFIG, &mut deps.storage);
     let constants = bincode2::serialize(&Constants {
         name: msg.name,
         symbol: msg.symbol,
         decimals: msg.decimals,
+        admin
     }).unwrap();
     config_store.set(KEY_CONSTANTS, &constants);
     config_store.set(KEY_TOTAL_SUPPLY, &total_supply.to_be_bytes());
@@ -86,6 +90,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
             amount,
         } => try_transfer_from(deps, env, &owner, &recipient, &amount),
         HandleMsg::Burn { amount } => try_burn(deps, env, &amount),
+        HandleMsg::Mint { amount, address } => try_mint(deps, env, address, amount),
         HandleMsg::CreateViewingKey { entropy } => try_create_key(deps, env, entropy),
         HandleMsg::SetViewingKey { key } => try_set_key(deps, env, key),
     }
@@ -276,6 +281,57 @@ fn get_balance<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>, account: 
     let consts = read_constants(&deps.storage)?;
 
     Ok(to_display_token(account_balance?, &consts.symbol, consts.decimals))
+}
+
+fn try_mint<S: Storage, A: Api, Q: Querier>(
+    deps: &mut Extern<S, A, Q>,
+    env: Env,
+    address: HumanAddr,
+    amount: Uint128) -> StdResult<HandleResponse> {
+
+    let msg_sender = deps.api.human_address(&env.message.sender)?;
+    let admin = read_constants(&deps.storage)?.admin;
+    if admin != msg_sender {
+        return Err(generic_err(
+            "Admin commands can only be ran from admin address",
+        ));
+    }
+
+    let amt = amount.u128();
+
+    let receipient_account = &deps.api.canonical_address(&address)?;
+
+    let mut account_balance = read_balance(&deps.storage, receipient_account)?;
+
+    account_balance += amt;
+
+    let mut balances_store = PrefixedStorage::new(PREFIX_BALANCES, &mut deps.storage);
+    balances_store.set(receipient_account.as_slice(), &account_balance.to_be_bytes());
+
+    let mut config_store = PrefixedStorage::new(PREFIX_CONFIG, &mut deps.storage);
+    let data = config_store
+        .get(KEY_TOTAL_SUPPLY)
+        .expect("no total supply data stored");
+    let mut total_supply = bytes_to_u128(&data).unwrap();
+
+    total_supply += amt;
+
+    config_store.set(KEY_TOTAL_SUPPLY, &total_supply.to_be_bytes());
+
+    let res = HandleResponse {
+        messages: vec![],
+        log: vec![
+            log("action", "mint"),
+            log(
+                "account",
+                address,
+            ),
+            log("amount", &amt.to_string()),
+        ],
+        data: None,
+    };
+
+    Ok(res)
 }
 
 fn try_deposit<S: Storage, A: Api, Q: Querier>(
