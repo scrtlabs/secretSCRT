@@ -70,10 +70,6 @@ pub enum HandleMsg {
         msg: Option<Binary>,
         padding: Option<String>,
     },
-    Burn {
-        amount: Uint128,
-        padding: Option<String>,
-    },
     RegisterReceive {
         code_hash: String,
         padding: Option<String>,
@@ -113,30 +109,6 @@ pub enum HandleMsg {
         msg: Option<Binary>,
         padding: Option<String>,
     },
-    BurnFrom {
-        owner: HumanAddr,
-        amount: Uint128,
-        padding: Option<String>,
-    },
-
-    // Mint
-    Mint {
-        amount: Uint128,
-        address: HumanAddr,
-        padding: Option<String>,
-    },
-    AddMinters {
-        minters: Vec<HumanAddr>,
-        padding: Option<String>,
-    },
-    RemoveMinters {
-        minters: Vec<HumanAddr>,
-        padding: Option<String>,
-    },
-    SetMinters {
-        minters: Vec<HumanAddr>,
-        padding: Option<String>,
-    },
 
     // Admin
     ChangeAdmin {
@@ -167,9 +139,6 @@ pub enum HandleAnswer {
     Send {
         status: ResponseStatus,
     },
-    Burn {
-        status: ResponseStatus,
-    },
     RegisterReceive {
         status: ResponseStatus,
     },
@@ -195,23 +164,6 @@ pub enum HandleAnswer {
         status: ResponseStatus,
     },
     SendFrom {
-        status: ResponseStatus,
-    },
-    BurnFrom {
-        status: ResponseStatus,
-    },
-
-    // Mint
-    Mint {
-        status: ResponseStatus,
-    },
-    AddMinters {
-        status: ResponseStatus,
-    },
-    RemoveMinters {
-        status: ResponseStatus,
-    },
-    SetMinters {
         status: ResponseStatus,
     },
 
@@ -245,7 +197,6 @@ pub enum QueryMsg {
         page: Option<u32>,
         page_size: u32,
     },
-    Minters {},
 }
 
 impl QueryMsg {
@@ -292,9 +243,6 @@ pub enum QueryAnswer {
 
     ViewingKeyError {
         msg: String,
-    },
-    Minters {
-        minters: Vec<HumanAddr>,
     },
 }
 
