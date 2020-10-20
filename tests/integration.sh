@@ -242,21 +242,6 @@ function deposit() {
     log "deposited ${amount}uscrt to \"$key\" successfully"
 }
 
-function burn() {
-    local contract_addr="$1"
-    local key="$2"
-    local amount="$3"
-
-    local burn_message='{"burn":{"amount":"'"$amount"'"}}'
-    local tx_hash
-    local burn_response
-    tx_hash="$(compute_execute "$contract_addr" "$burn_message" ${FROM[$key]} --gas 150000)"
-    burn_response="$(data_of wait_for_compute_tx "$tx_hash" "waiting for burn for \"$key\" to process")"
-    echo "$burn_response"
-    assert_eq "$burn_response" "$(pad_space '{"burn":{"status":"success"}}')"
-    log "burned ${amount}uscrt for \"$key\" successfully"
-}
-
 function get_balance() {
     local contract_addr="$1"
     local key="$2"
@@ -766,54 +751,6 @@ function test_send() {
     redeem_receiver "$receiver_addr" "$contract_addr" "${ADDRESS[a]}" 400000
 }
 
-# This test also tests TokenInfo
-function test_burn() {
-    local contract_addr="$1"
-
-    log_test_header
-
-    local token_info_response
-    local burn_response
-
-    # Deposit to "a"
-    deposit "$contract_addr" 'a' 1000000
-
-    # Check total supply
-    token_info_response="$(get_token_info "$contract_addr")"
-    log 'token info response was' "$token_info_response"
-    assert_eq "$(jq -r '.token_info.total_supply' <<<"$token_info_response")" 1000000
-
-    # Try to over-burn
-    local burn_message='{"burn":{"amount":"10000000"}}' # 110%
-    local tx_hash
-    local burn_response
-    tx_hash="$(compute_execute "$contract_addr" "$burn_message" ${FROM[a]} --gas 150000)"
-    ! burn_response="$(wait_for_compute_tx "$tx_hash" 'waiting for burn for "a" to process')"
-    assert_eq "$(get_generic_err "$burn_response")" 'insufficient funds to burn: balance=1000000, required=10000000'
-
-    # Check "a" balance - should not have changes
-    assert_eq "$(get_balance "$contract_addr" 'a')" 1000000
-
-    # Check total supply
-    token_info_response="$(get_token_info "$contract_addr")"
-    log 'token info response was' "$token_info_response"
-    assert_eq "$(jq -r '.token_info.total_supply' <<<"$token_info_response")" 1000000
-
-    # Try to burn
-    burn_response="$(burn "$contract_addr" 'a' 100000)" # 10%
-
-    # Check "a" balance
-    assert_eq "$(get_balance "$contract_addr" 'a')" 900000
-
-    # Check total supply
-    token_info_response="$(get_token_info "$contract_addr")"
-    log 'token info response was' "$token_info_response"
-    assert_eq "$(jq -r '.token_info.total_supply' <<<"$token_info_response")" 900000
-
-    # Redeem "a"
-    redeem "$contract_addr" 'a' 900000
-}
-
 function test_transfer_from() {
     local contract_addr="$1"
 
@@ -1068,7 +1005,6 @@ function main() {
     test_deposit "$contract_addr"
     test_transfer "$contract_addr"
     test_send "$contract_addr"
-    test_burn "$contract_addr"
     test_transfer_from "$contract_addr"
     test_send_from "$contract_addr"
 
