@@ -1,13 +1,14 @@
 # Secret-SCRT - Privacy coin backed by SCRT
 
 This is a privacy token implementation on the Secret Network. It is backed by
-the native coin of the network (SCRT) and has a fixed 1-to-1 exchange ratio with it.
+the native coin of the network (SCRT) and has a fixed 1-to-1 exchange ratio
+with it.
 
 Version 1.0.0 of this contract is deployed to mainnet at the address
 `secret1k0jntykt7e4g3y88ltc60czgjuqdy4c9e8fzek`. The deployed binary can be
 reproduced by checking out the commit tagged `v1.0.0` of this repository and
 running the command `make compile-optimized-reproducible`.
-See [Verifying build](#Verifying%20build) for full instructions of how to
+See [Verifying build](#verifying-build) for full instructions of how to
 verify the authenticity of the deployed binary.
 
 Usage is pretty simple - you deposit SCRT into the contract, and you get SSCRT 
