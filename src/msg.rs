@@ -52,6 +52,7 @@ pub enum HandleMsg {
     // Native coin interactions
     Redeem {
         amount: Uint128,
+        denom: Option<String>,
         padding: Option<String>,
     },
     Deposit {
@@ -185,7 +186,6 @@ pub enum QueryMsg {
         owner: HumanAddr,
         spender: HumanAddr,
         key: String,
-        padding: Option<String>,
     },
     Balance {
         address: HumanAddr,

@@ -1618,6 +1618,7 @@ mod tests {
 
         let handle_msg = HandleMsg::Redeem {
             amount: Uint128(1000),
+            denom: None,
             padding: None,
         };
         let handle_result = handle(&mut deps, mock_env("butler", &[]), handle_msg);
@@ -1742,6 +1743,7 @@ mod tests {
 
         let withdraw_msg = HandleMsg::Redeem {
             amount: Uint128(5000),
+            denom: None,
             padding: None,
         };
         let handle_result = handle(&mut deps, mock_env("lebron", &[]), withdraw_msg);
@@ -1790,6 +1792,7 @@ mod tests {
 
         let withdraw_msg = HandleMsg::Redeem {
             amount: Uint128(5000),
+            denom: None,
             padding: None,
         };
         let handle_result = handle(&mut deps, mock_env("lebron", &[]), withdraw_msg);
@@ -1948,7 +1951,6 @@ mod tests {
             owner: HumanAddr("giannis".to_string()),
             spender: HumanAddr("lebron".to_string()),
             key: vk1.0.clone(),
-            padding: None,
         };
         let query_result = query(&deps, query_msg);
         assert!(
@@ -1993,7 +1995,6 @@ mod tests {
             owner: HumanAddr("giannis".to_string()),
             spender: HumanAddr("lebron".to_string()),
             key: vk1.0.clone(),
-            padding: None,
         };
         let query_result = query(&deps, query_msg);
         let allowance = match from_binary(&query_result.unwrap()).unwrap() {
@@ -2006,7 +2007,6 @@ mod tests {
             owner: HumanAddr("giannis".to_string()),
             spender: HumanAddr("lebron".to_string()),
             key: vk2.0.clone(),
-            padding: None,
         };
         let query_result = query(&deps, query_msg);
         let allowance = match from_binary(&query_result.unwrap()).unwrap() {
@@ -2019,7 +2019,6 @@ mod tests {
             owner: HumanAddr("lebron".to_string()),
             spender: HumanAddr("giannis".to_string()),
             key: vk2.0.clone(),
-            padding: None,
         };
         let query_result = query(&deps, query_msg);
         let allowance = match from_binary(&query_result.unwrap()).unwrap() {
