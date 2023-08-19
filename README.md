@@ -68,8 +68,8 @@ secretcli q snip20 history sscrt <account-address> <viewing-key> [optional: page
 
 ## Play with it on testnet
 
-The deployed SSCRT contract address on the testnet is
-`secret1umwqjum7f4zmp9alr2kpmq4y5j4hyxlam896r3` and label `sscrt`
+The deployed SSCRT contract address on the pulsar-3 testnet is
+`secret1gvn6eap7xgsf9kydgmvpqwzkru2zj35ar2vncj` and label `sscrt`
 
 ## Troubleshooting 
 
